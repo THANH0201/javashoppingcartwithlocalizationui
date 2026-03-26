@@ -7,7 +7,7 @@ pipeline {
     environment {
         PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;${env.PATH}"
         DOCKERHUB_CREDENTIALS_ID = 'dockerhub'
-        DOCKER_IMAGE = 'thanh0201/javashoppingcartwithlocalization'
+        DOCKER_IMAGE = 'thanh0201/javashoppingcartwithlocalizationui'
         DOCKER_TAG = 'latest'
     }
 
@@ -24,7 +24,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/THANH0201/JavaShoppingCartwithLocalization.git'
+                git branch: 'main', url: 'https://github.com/THANH0201/JavaShoppingCartwithLocalizationui.git'
             }
         }
 
