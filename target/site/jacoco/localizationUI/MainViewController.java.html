@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MainViewController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">javashoppingcartwithlocalizationUI</a> &gt; <a href="index.source.html" class="el_package">localizationUI</a> &gt; <span class="el_source">MainViewController.java</span></div><h1>MainViewController.java</h1><pre class="source lang-java linenums">package localizationUI;
+
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.geometry.NodeOrientation;
+import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.VBox;
+
+import java.util.*;
+
+import static localizationUI.LocalizationService.t;
+
+<span class="nc" id="L15">public class MainViewController {</span>
+    @FXML private Button backButton;
+    // UI elements
+    @FXML private Label totalLabelText;
+    @FXML private Label finalTotalLabelText;
+    @FXML private Label afterTaxLabelText;
+    @FXML private Label taxLabelText;
+    @FXML private Label afterDiscountLabelText;
+    @FXML private Label discountLabelText;
+    @FXML private VBox priceSummaryBox;
+    @FXML private Button calButton;
+    @FXML private VBox itemSection;
+    @FXML private VBox rootVBox;
+    @FXML private MenuButton languageMenu;
+    @FXML private Label titleLabel;
+    @FXML private ListView&lt;String&gt; itemList;
+    @FXML private TextField priceField;
+    @FXML private TextField quantityField;
+    @FXML private Button addButton;
+    @FXML private VBox cartSection;
+    @FXML private Button cartButton;
+    @FXML private ListView&lt;String&gt; cartList;
+    @FXML private Label totalLabel;
+    @FXML private Label discountLabel;
+    @FXML private Label afterDiscountLabel;
+    @FXML private Label taxLabel;
+    @FXML private Label afterTaxLabel;
+    @FXML private Label finalTotalLabel;
+    @FXML private Button payButton;
+
+<span class="nc" id="L45">    private Locale currentLocale = new Locale(&quot;en&quot;, &quot;US&quot;);</span>
+    private Map&lt;String, String&gt; localizedStrings;
+
+<span class="nc" id="L48">    private final Map&lt;String, ItemModel&gt; cart = new HashMap&lt;&gt;();</span>
+
+    /**
+     * Initialize controller
+     */
+    @FXML
+    public void initialize() {
+<span class="nc" id="L55">        loadLanguageMenu();</span>
+<span class="nc" id="L56">        setLanguage(currentLocale);</span>
+<span class="nc" id="L57">        cartSection.setVisible(false);</span>
+<span class="nc" id="L58">    }</span>
+
+    /**
+     * Load language menu dynamically
+     */
+    private void loadLanguageMenu() {
+<span class="nc" id="L64">        Properties props = new Properties();</span>
+
+        try {
+<span class="nc" id="L67">            props.load(getClass().getResourceAsStream(&quot;/languages.properties&quot;));</span>
+<span class="nc" id="L68">        } catch (Exception e) {</span>
+<span class="nc" id="L69">            e.printStackTrace();</span>
+<span class="nc" id="L70">        }</span>
+
+<span class="nc" id="L72">        languageMenu.getItems().clear();</span>
+
+<span class="nc" id="L74">        props.forEach((name, code) -&gt; {</span>
+<span class="nc" id="L75">            String[] parts = code.toString().split(&quot;_&quot;);</span>
+<span class="nc bnc" id="L76" title="All 2 branches missed.">            if (parts.length == 2) {</span>
+<span class="nc" id="L77">                Locale locale = new Locale(parts[0], parts[1]);</span>
+<span class="nc" id="L78">                MenuItem item = new MenuItem(name.toString());</span>
+<span class="nc" id="L79">                item.setOnAction(e -&gt; setLanguage(locale));</span>
+<span class="nc" id="L80">                languageMenu.getItems().add(item);</span>
+<span class="nc" id="L81">            } else {</span>
+<span class="nc" id="L82">                System.err.println(&quot;Invalid language entry: &quot; + name + &quot;=&quot; + code);</span>
+            }
+<span class="nc" id="L84">        });</span>
+<span class="nc" id="L85">    }</span>
+    @FXML
+    public void switchToLanguageCurrent() {
+<span class="nc" id="L88">        setLanguage(currentLocale);</span>
+<span class="nc" id="L89">    }</span>
+    /**
+     * Apply localization
+     */
+    private void setLanguage(Locale locale) {
+<span class="nc" id="L94">        currentLocale = locale;</span>
+<span class="nc" id="L95">        localizedStrings = LocalizationService.getLocalizedStrings(locale);</span>
+<span class="nc" id="L96">        Locale.setDefault(locale);</span>
+
+        // Update UI text
+<span class="nc" id="L99">        languageMenu.setText(t(&quot;language.current&quot;));</span>
+<span class="nc" id="L100">        loadItemList();</span>
+<span class="nc" id="L101">        updateUI();</span>
+<span class="nc" id="L102">        applyTextDirection(locale);</span>
+<span class="nc" id="L103">    }</span>
+
+    /**
+     * Load items into ListView
+     */
+    @FXML
+    private void loadItemList() {
+<span class="nc" id="L110">        itemList.getItems().clear();</span>
+        // default
+<span class="nc" id="L112">        itemList.getItems().add(t(&quot;shopping.select.item&quot;));</span>
+
+<span class="nc" id="L114">        localizedStrings.keySet().stream()</span>
+<span class="nc" id="L115">                .filter(key -&gt; key.startsWith(&quot;item.&quot;))</span>
+<span class="nc" id="L116">                .sorted()</span>
+<span class="nc" id="L117">                .forEach(key -&gt; itemList.getItems().add(t(key)));</span>
+<span class="nc" id="L118">    }</span>
+
+    /**
+     * Add item to cart
+     */
+    @FXML
+    private void addItem() {
+        try {
+<span class="nc" id="L126">            String itemName = itemList.getSelectionModel().getSelectedItem();</span>
+<span class="nc bnc" id="L127" title="All 2 branches missed.">            if (itemName == null) {</span>
+<span class="nc" id="L128">                showAlert(t(&quot;error.invalid_input&quot;));</span>
+<span class="nc" id="L129">                return;</span>
+            }
+
+<span class="nc" id="L132">            double price = Double.parseDouble(priceField.getText());</span>
+<span class="nc" id="L133">            double qty = Double.parseDouble(quantityField.getText());</span>
+
+            // ItemModel
+<span class="nc" id="L136">            ItemModel item = new ItemModel(itemName, price, qty);</span>
+
+<span class="nc" id="L138">            cart.put(itemName, item);</span>
+            // Display
+<span class="nc" id="L140">            cartList.getItems().add(itemName + &quot; | &quot; + price + &quot; x &quot; + qty + &quot; = &quot; + item.getTotal());</span>
+
+<span class="nc" id="L142">            showAlert(t(&quot;added&quot;) + &quot; &quot; + itemName);</span>
+
+<span class="nc" id="L144">            priceField.clear();</span>
+<span class="nc" id="L145">            quantityField.clear();</span>
+
+<span class="nc" id="L147">        } catch (Exception e) {</span>
+<span class="nc" id="L148">            showAlert(t(&quot;error.invalid_input&quot;));</span>
+<span class="nc" id="L149">        }</span>
+<span class="nc" id="L150">    }</span>
+
+    @FXML
+    private void onCart() {
+<span class="nc" id="L154">        itemSection.setVisible(true);</span>
+<span class="nc" id="L155">        cartSection.setVisible(true);</span>
+<span class="nc" id="L156">        priceSummaryBox.setVisible(false);</span>
+
+<span class="nc" id="L158">    }</span>
+    @FXML
+    private void deleteItem() {
+<span class="nc" id="L161">        String selected = cartList.getSelectionModel().getSelectedItem();</span>
+<span class="nc bnc" id="L162" title="All 2 branches missed.">        if (selected != null) {</span>
+<span class="nc" id="L163">            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);</span>
+<span class="nc" id="L164">            alert.setHeaderText(t(&quot;delete.item&quot;));</span>
+
+<span class="nc" id="L166">            ButtonType yes = new ButtonType(t(&quot;yes&quot;));</span>
+<span class="nc" id="L167">            ButtonType no = new ButtonType(t(&quot;no&quot;));</span>
+
+<span class="nc" id="L169">            alert.getButtonTypes().setAll(yes, no);</span>
+
+<span class="nc" id="L171">            alert.showAndWait().ifPresent(response -&gt; {</span>
+<span class="nc bnc" id="L172" title="All 2 branches missed.">                if (response == yes) {</span>
+<span class="nc" id="L173">                    showAlert(t(&quot;thanks&quot;));</span>
+                } else {
+<span class="nc" id="L175">                    showAlert(t(&quot;sorry&quot;));</span>
+                }
+<span class="nc" id="L177">            });</span>
+<span class="nc" id="L178">            cartList.getItems().remove(selected);</span>
+        }
+<span class="nc" id="L180">    }</span>
+    /**
+     * Calculate total, discount, tax, final total
+     */
+    @FXML
+    private void calculateTotal() {
+<span class="nc" id="L186">        priceSummaryBox.setVisible(true);</span>
+
+<span class="nc" id="L188">        Map&lt;String, Double&gt; result = CartCalculatorService.calculateTotal(cart);</span>
+
+<span class="nc" id="L190">        totalLabel.setText(String.format(&quot;%.2f EUR&quot;, result.get(&quot;total&quot;)));</span>
+<span class="nc" id="L191">        discountLabel.setText( String.format(&quot;%.2f EUR&quot;, result.get(&quot;discountAmount&quot;)));</span>
+<span class="nc" id="L192">        afterDiscountLabel.setText( String.format(&quot;%.2f EUR&quot;, result.get(&quot;afterDiscount&quot;)));</span>
+<span class="nc" id="L193">        taxLabel.setText( String.format(&quot;%.2f EUR&quot;, result.get(&quot;taxAmount&quot;)));</span>
+<span class="nc" id="L194">        afterTaxLabel.setText(String.format(&quot;%.2f EUR&quot;, result.get(&quot;afterTax&quot;)));</span>
+<span class="nc" id="L195">        finalTotalLabel.setText( String.format(&quot;%.2f EUR&quot;, result.get(&quot;afterTax&quot;)));</span>
+<span class="nc" id="L196">    }</span>
+
+    /**
+     * Payment confirmation
+     */
+    @FXML
+    private void onPay() {
+<span class="nc" id="L203">        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);</span>
+<span class="nc" id="L204">        alert.setHeaderText(t(&quot;shopping.pay&quot;));</span>
+
+<span class="nc" id="L206">        ButtonType yes = new ButtonType(t(&quot;yes&quot;));</span>
+<span class="nc" id="L207">        ButtonType no = new ButtonType(t(&quot;no&quot;));</span>
+
+<span class="nc" id="L209">        alert.getButtonTypes().setAll(yes, no);</span>
+
+<span class="nc" id="L211">        alert.showAndWait().ifPresent(response -&gt; {</span>
+<span class="nc bnc" id="L212" title="All 2 branches missed.">            if (response == yes) {</span>
+<span class="nc" id="L213">                showAlert(t(&quot;thanks&quot;));</span>
+            } else {
+<span class="nc" id="L215">                showAlert(t(&quot;sorry&quot;));</span>
+            }
+<span class="nc" id="L217">        });</span>
+<span class="nc" id="L218">        cartList.getItems().clear();</span>
+<span class="nc" id="L219">        priceSummaryBox.getChildren().clear();</span>
+<span class="nc" id="L220">    }</span>
+
+    /**
+     * RTL support for Arabic
+     */
+    private void applyTextDirection(Locale locale) {
+<span class="nc" id="L226">        boolean isRTL = locale.getLanguage().equals(&quot;ar&quot;);</span>
+
+<span class="nc" id="L228">        Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L229">            rootVBox.setNodeOrientation(</span>
+<span class="nc bnc" id="L230" title="All 2 branches missed.">                    isRTL ? NodeOrientation.RIGHT_TO_LEFT : NodeOrientation.LEFT_TO_RIGHT</span>
+            );
+<span class="nc" id="L232">        });</span>
+<span class="nc" id="L233">    }</span>
+
+    /**
+     * Show alert
+     */
+    private void showAlert(String msg) {
+<span class="nc" id="L239">        Alert alert = new Alert(Alert.AlertType.INFORMATION);</span>
+<span class="nc" id="L240">        alert.setHeaderText(null);</span>
+<span class="nc" id="L241">        alert.setContentText(msg);</span>
+<span class="nc" id="L242">        alert.showAndWait();</span>
+<span class="nc" id="L243">    }</span>
+    /**
+     * Update UI
+     */
+
+    private void updateUI() {
+
+<span class="nc" id="L250">        titleLabel.setText(t(&quot;titleLabel&quot;));</span>
+
+<span class="nc" id="L252">        priceField.setPromptText(t(&quot;shopping.enter.price&quot;));</span>
+<span class="nc" id="L253">        quantityField.setPromptText(t(&quot;shopping.enter.quantity&quot;));</span>
+
+
+<span class="nc" id="L256">        addButton.setText(t(&quot;shopping.add&quot;));</span>
+<span class="nc" id="L257">        cartButton.setText(t(&quot;shopping.cart&quot;));</span>
+<span class="nc" id="L258">        payButton.setText(t(&quot;shopping.pay&quot;));</span>
+<span class="nc" id="L259">        calButton.setText(t(&quot;shopping.calculate&quot;));</span>
+<span class="nc" id="L260">        backButton.setText(t(&quot;shopping.back&quot;));</span>
+
+<span class="nc" id="L262">        totalLabelText.setText(t(&quot;shopping.total&quot;));</span>
+<span class="nc" id="L263">        discountLabelText.setText(t(&quot;shopping.discount&quot;));</span>
+<span class="nc" id="L264">        afterDiscountLabelText.setText(t(&quot;total.after.discount&quot;));</span>
+<span class="nc" id="L265">        taxLabelText.setText(t(&quot;shopping.tax&quot;));</span>
+<span class="nc" id="L266">        afterTaxLabelText.setText(t(&quot;total.after.tax&quot;));</span>
+<span class="nc" id="L267">        finalTotalLabelText.setText(t(&quot;shopping.final.total&quot;));</span>
+<span class="nc" id="L268">    }</span>
+
+    public void switchBackToItems() {
+<span class="nc" id="L271">        cartSection.setVisible(false);</span>
+<span class="nc" id="L272">        itemSection.setVisible(true);</span>
+<span class="nc" id="L273">        priceSummaryBox.getChildren().clear();</span>
+<span class="nc" id="L274">        }</span>
+
+
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

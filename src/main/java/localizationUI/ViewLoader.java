@@ -37,13 +37,13 @@ public class ViewLoader {
 
         Locale locale = Locale.getDefault();
 
-        // Nếu là tiếng Lào → đổi font
+        // if Lao changes font
         if (locale.getLanguage().equals("lo")) {
 
-            // Áp dụng font
+            // font
             scene.getRoot().setStyle("-fx-font-family: 'Noto Sans Lao';");
 
-            // Thêm CSS class nếu muốn
+
             Parent root = scene.getRoot();
             if (!root.getStyleClass().contains("locale-lo")) {
                 root.getStyleClass().add("locale-lo");

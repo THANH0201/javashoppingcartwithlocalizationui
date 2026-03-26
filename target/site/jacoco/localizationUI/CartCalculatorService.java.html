@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CartCalculatorService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">javashoppingcartwithlocalizationUI</a> &gt; <a href="index.source.html" class="el_package">localizationUI</a> &gt; <span class="el_source">CartCalculatorService.java</span></div><h1>CartCalculatorService.java</h1><pre class="source lang-java linenums">package localizationUI;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class CartCalculatorService {
+
+    private CartCalculatorService() {}
+
+    public static Map&lt;String, Double&gt; calculateTotal(Map&lt;String, ItemModel&gt; cart) {
+
+<span class="fc" id="L12">        Map&lt;String, Double&gt; result = new HashMap&lt;&gt;();</span>
+
+        // 1. Total
+<span class="fc" id="L15">        double total = cart.values().stream()</span>
+<span class="fc" id="L16">                .mapToDouble(ItemModel::getTotal)</span>
+<span class="fc" id="L17">                .sum();</span>
+<span class="fc" id="L18">        result.put(&quot;total&quot;, total);</span>
+
+        // 2. Discount (10%)
+<span class="fc" id="L21">        double afterDiscount = total * 0.9;</span>
+<span class="fc" id="L22">        result.put(&quot;afterDiscount&quot;, afterDiscount);</span>
+<span class="fc" id="L23">        result.put(&quot;discountAmount&quot;, total - afterDiscount);</span>
+
+        // 3. Tax (24%)
+<span class="fc" id="L26">        double afterTax = afterDiscount * 1.24;</span>
+<span class="fc" id="L27">        result.put(&quot;afterTax&quot;, afterTax);</span>
+<span class="fc" id="L28">        result.put(&quot;taxAmount&quot;, afterTax - afterDiscount);</span>
+
+<span class="fc" id="L30">        return result;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

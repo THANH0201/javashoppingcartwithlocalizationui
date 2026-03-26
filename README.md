@@ -1,4 +1,6 @@
-### Build Jenkins(CICD)-push docker
+
+### Goal
+Build a simple JavaFX GUI application that calculates the total cost of items in a shopping cart, supports localization (multiple languages), and demonstrates Docker and CI/CD pipeline integration### Build Jenkins(CICD)-push docker  
 ### Testing Docker Container (Windows + VcXsrv)
 1. Before running the container, start VcXsrv/XLaunch with:
 
@@ -8,7 +10,7 @@
 
 ❌ Native OpenGL (must be OFF)
 
-✔ Disable access control
+✔ Disable access control  
 2. Start docker destop
 3. Run with Docker Destop
 or terminal run
