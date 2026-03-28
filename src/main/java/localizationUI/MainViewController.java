@@ -1,11 +1,9 @@
 package localizationUI;
 
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.NodeOrientation;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
 import java.util.*;
@@ -13,34 +11,54 @@ import java.util.*;
 import static localizationUI.LocalizationService.t;
 
 public class MainViewController {
-    @FXML private Button backButton;
+
     // UI elements
-    @FXML private Label totalLabelText;
-    @FXML private Label finalTotalLabelText;
-    @FXML private Label afterTaxLabelText;
-    @FXML private Label taxLabelText;
-    @FXML private Label afterDiscountLabelText;
-    @FXML private Label discountLabelText;
-    @FXML private VBox priceSummaryBox;
-    @FXML private Button calButton;
     @FXML private VBox itemSection;
     @FXML private VBox rootVBox;
     @FXML private MenuButton languageMenu;
+    @I18nKey("titleLabel")
     @FXML private Label titleLabel;
     @FXML private ListView<String> itemList;
+    @I18nKey("shopping.enter.price")
     @FXML private TextField priceField;
+    @I18nKey("shopping.enter.quantity")
     @FXML private TextField quantityField;
+    @I18nKey("shopping.add")
     @FXML private Button addButton;
     @FXML private VBox cartSection;
     @FXML private Button cartButton;
+    @I18nKey("shopping.cart")
+    @FXML private Label cartText;
+    @FXML private Label totalItem;
     @FXML private ListView<String> cartList;
+    @I18nKey("shopping.calculate")
+    @FXML private Button calButton;
+    @FXML private VBox priceSummaryBox;
+    @I18nKey("shopping.total")
+    @FXML private Label totalLabelText;
+    @I18nKey("shopping.discount")
+    @FXML private Label discountLabelText;
+    @I18nKey("total.after.discount")
+    @FXML private Label afterDiscountLabelText;
+    @I18nKey("shopping.tax")
+    @FXML private Label taxLabelText;
+    @I18nKey("total.after.tax")
+    @FXML private Label afterTaxLabelText;
+    @I18nKey("shopping.final.total")
+    @FXML private Label finalTotalLabelText;
+
     @FXML private Label totalLabel;
     @FXML private Label discountLabel;
     @FXML private Label afterDiscountLabel;
     @FXML private Label taxLabel;
     @FXML private Label afterTaxLabel;
     @FXML private Label finalTotalLabel;
+
+    @I18nKey("shopping.pay")
     @FXML private Button payButton;
+    @I18nKey("shopping.back")
+    @FXML private Button backButton;
+
 
     private Locale currentLocale = new Locale("en", "US");
     private Map<String, String> localizedStrings;
@@ -64,7 +82,7 @@ public class MainViewController {
         Properties props = new Properties();
 
         try {
-            props.load(getClass().getResourceAsStream("/languages.properties"));
+            props.load(getClass().getResourceAsStream("/i18n/languages.properties"));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -76,6 +94,10 @@ public class MainViewController {
             if (parts.length == 2) {
                 Locale locale = new Locale(parts[0], parts[1]);
                 MenuItem item = new MenuItem(name.toString());
+                // Laos
+                if (locale.getLanguage().equals("lo")) {
+                    item.setStyle("-fx-font-family: 'Noto Sans Lao';");
+                }
                 item.setOnAction(e -> setLanguage(locale));
                 languageMenu.getItems().add(item);
             } else {
@@ -83,10 +105,14 @@ public class MainViewController {
             }
         });
     }
+    /**
+     * Choose language
+     */
     @FXML
     public void switchToLanguageCurrent() {
         setLanguage(currentLocale);
     }
+
     /**
      * Apply localization
      */
@@ -96,6 +122,17 @@ public class MainViewController {
         Locale.setDefault(locale);
 
         // Update UI text
+        // Reset font
+        rootVBox.setStyle("");
+
+        // Laos
+        if (locale.getLanguage().equals("lo")) {
+            rootVBox.setStyle("-fx-font-family: 'Noto Sans Lao';");
+        }
+        // Normal
+        else {
+            rootVBox.setStyle("-fx-font-family: 'Inter';");
+        }
         languageMenu.setText(t("language.current"));
         loadItemList();
         updateUI();
@@ -116,12 +153,11 @@ public class MainViewController {
                 .sorted()
                 .forEach(key -> itemList.getItems().add(t(key)));
     }
-
     /**
-     * Add item to cart
+     * Action buttons
      */
     @FXML
-    private void addItem() {
+    private void onAddItem() {
         try {
             String itemName = itemList.getSelectionModel().getSelectedItem();
             if (itemName == null) {
@@ -134,15 +170,18 @@ public class MainViewController {
 
             // ItemModel
             ItemModel item = new ItemModel(itemName, price, qty);
-
             cart.put(itemName, item);
+
             // Display
-            cartList.getItems().add(itemName + " | " + price + " x " + qty + " = " + item.getTotal());
+            cartList.getItems().add(itemName + ":" + price + " x " + qty + " = " + item.getTotal());
 
             showAlert(t("added") + " " + itemName);
 
             priceField.clear();
             quantityField.clear();
+
+            //update CartButton
+            totalItem.setText(String.valueOf(cart.size()));
 
         } catch (Exception e) {
             showAlert(t("error.invalid_input"));
@@ -156,6 +195,7 @@ public class MainViewController {
         priceSummaryBox.setVisible(false);
 
     }
+
     @FXML
     private void deleteItem() {
         String selected = cartList.getSelectionModel().getSelectedItem();
@@ -178,26 +218,21 @@ public class MainViewController {
             cartList.getItems().remove(selected);
         }
     }
-    /**
-     * Calculate total, discount, tax, final total
-     */
+
     @FXML
-    private void calculateTotal() {
+    private void onCalculate() {
         priceSummaryBox.setVisible(true);
 
         Map<String, Double> result = CartCalculatorService.calculateTotal(cart);
 
         totalLabel.setText(String.format("%.2f EUR", result.get("total")));
-        discountLabel.setText( String.format("%.2f EUR", result.get("discountAmount")));
-        afterDiscountLabel.setText( String.format("%.2f EUR", result.get("afterDiscount")));
-        taxLabel.setText( String.format("%.2f EUR", result.get("taxAmount")));
+        discountLabel.setText(String.format("%.2f EUR", result.get("discountAmount")));
+        afterDiscountLabel.setText(String.format("%.2f EUR", result.get("afterDiscount")));
+        taxLabel.setText(String.format("%.2f EUR", result.get("taxAmount")));
         afterTaxLabel.setText(String.format("%.2f EUR", result.get("afterTax")));
-        finalTotalLabel.setText( String.format("%.2f EUR", result.get("afterTax")));
+        finalTotalLabel.setText(String.format("%.2f EUR", result.get("afterTax")));
     }
 
-    /**
-     * Payment confirmation
-     */
     @FXML
     private void onPay() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -216,6 +251,14 @@ public class MainViewController {
             }
         });
         cartList.getItems().clear();
+        cart.clear();
+        totalItem.setText("0");
+        priceSummaryBox.getChildren().clear();
+    }
+
+    public void onBack() {
+        cartSection.setVisible(false);
+        itemSection.setVisible(true);
         priceSummaryBox.getChildren().clear();
     }
 
@@ -241,38 +284,14 @@ public class MainViewController {
         alert.setContentText(msg);
         alert.showAndWait();
     }
+
     /**
      * Update UI
      */
 
     private void updateUI() {
-
-        titleLabel.setText(t("titleLabel"));
-
-        priceField.setPromptText(t("shopping.enter.price"));
-        quantityField.setPromptText(t("shopping.enter.quantity"));
-
-
-        addButton.setText(t("shopping.add"));
-        cartButton.setText(t("shopping.cart"));
-        payButton.setText(t("shopping.pay"));
-        calButton.setText(t("shopping.calculate"));
-        backButton.setText(t("shopping.back"));
-
-        totalLabelText.setText(t("shopping.total"));
-        discountLabelText.setText(t("shopping.discount"));
-        afterDiscountLabelText.setText(t("total.after.discount"));
-        taxLabelText.setText(t("shopping.tax"));
-        afterTaxLabelText.setText(t("total.after.tax"));
-        finalTotalLabelText.setText(t("shopping.final.total"));
+        LocalizationService.updateUI(this);
     }
-
-    public void switchBackToItems() {
-        cartSection.setVisible(false);
-        itemSection.setVisible(true);
-        priceSummaryBox.getChildren().clear();
-        }
-
-
 }
+
 

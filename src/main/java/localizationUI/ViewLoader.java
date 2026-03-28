@@ -3,51 +3,32 @@ package localizationUI;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import javafx.stage.Stage;
 
-import java.net.URL;
+import java.io.IOException;
 import java.util.Locale;
+
 
 public class ViewLoader {
 
-    public static Scene loadMainView() throws Exception {
+    public static void loadScene(Stage stage, Locale locale) throws IOException {
 
-        // Load Lao font
-        Font.loadFont(ViewLoader.class.getResourceAsStream("/fonts/NotoSansLao.ttf"), 12);
+        Font f = Font.loadFont(ViewLoader.class.getResourceAsStream("/fonts/NotoSansLao-Regular.ttf"), 12);
 
-        URL fxmlUrl = ViewLoader.class.getResource("/main_view.fxml");
-        FXMLLoader loader = new FXMLLoader(fxmlUrl);
-
-        VBox root = loader.load();
+        System.out.println(f.getName());
+        //ResourceBundle if reload FXML
+        FXMLLoader loader = new FXMLLoader(Main.class.getResource("/main_view.fxml"));
+        Parent root = loader.load();
         Scene scene = new Scene(root);
-
-        applyLocaleFont(scene);
+        stage.setScene(scene);
 
         // Add CSS
         scene.getStylesheets().add(
                 ViewLoader.class.getResource("/style.css").toExternalForm()
         );
-
-        return scene;
-    }
-
-    private static void applyLocaleFont(Scene scene) {
-        if (scene == null) return;
-
-        Locale locale = Locale.getDefault();
-
-        // if Lao changes font
-        if (locale.getLanguage().equals("lo")) {
-
-            // font
-            scene.getRoot().setStyle("-fx-font-family: 'Noto Sans Lao';");
-
-
-            Parent root = scene.getRoot();
-            if (!root.getStyleClass().contains("locale-lo")) {
-                root.getStyleClass().add("locale-lo");
-            }
-        }
+        //reload UI
+//        MainViewController controller = loader.getController();
+//        controller.setStageAndLocale(stage, locale);
     }
 }

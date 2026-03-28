@@ -1,5 +1,9 @@
 package localizationUI;
 
+import javafx.scene.control.Labeled;
+import javafx.scene.control.TextInputControl;
+
+import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -18,7 +22,7 @@ public class LocalizationService {
         Map<String, String> strings = new LinkedHashMap<>();
 
         try {
-            ResourceBundle bundle = ResourceBundle.getBundle("MessagesBundle", locale);
+            ResourceBundle bundle = ResourceBundle.getBundle("i18n.MessagesBundle", locale);
 
             // Load all keys in order
             for (String key : bundle.keySet()) {
@@ -64,6 +68,27 @@ public class LocalizationService {
         if (currentStrings == null) return key;
         return currentStrings.getOrDefault(key, key);
     }
+    //Update
+    public static void updateUI(Object controller) {
+        for (Field field : controller.getClass().getDeclaredFields()) {
+            if (field.isAnnotationPresent(I18nKey.class)) {
+                I18nKey key = field.getAnnotation(I18nKey.class);
+                field.setAccessible(true);
+
+                try {
+                    Object node = field.get(controller);
+
+                    if (node instanceof Labeled labeled) {
+                        labeled.setText(t(key.value()));
+                    } else if (node instanceof TextInputControl input) {
+                        input.setPromptText(t(key.value()));
+                    }
+
+                } catch (Exception ignored) {}
+            }
+        }
+    }
+
 }
 
 

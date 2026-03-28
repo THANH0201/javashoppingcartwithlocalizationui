@@ -44,14 +44,23 @@
         <HBox>
             <!-- ADD BUTTON -->
             <Button fx:id="addButton"
-                    onAction="#addItem"
+                    onAction="#onAddItem"
                     prefWidth="100"/>
             <!-- space -->
             <Region HBox.hgrow="ALWAYS"/>
             <!-- CART BUTTON -->
             <Button fx:id="cartButton"
                     onAction="#onCart"
-                    prefWidth="100"/>
+                    prefWidth="120">
+                <graphic>
+                    <HBox spacing="6" alignment="CENTER">
+                        <Label fx:id="cartText"/>
+                        <Label fx:id="totalItem" text="0" />
+                    </HBox>
+                </graphic>
+            </Button>
+
+
         </HBox>
     </VBox>
 
@@ -68,7 +77,7 @@
         <HBox>
             <!-- CALCULATION BUTTON -->
             <Button fx:id="calButton"
-                onAction="#calculateTotal"
+                onAction="#onCalculate"
                 prefWidth="100"/>
             <Button fx:id="payButton"
                 onAction="#onPay"
@@ -76,7 +85,7 @@
 
             <!-- OPTIONAL: BACK BUTTON -->
             <Button fx:id="backButton" text=""
-                onAction="#switchBackToItems"
+                onAction="#onBack"
                 prefWidth="100"/>
         </HBox>
     </VBox>

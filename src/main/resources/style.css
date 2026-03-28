@@ -1,4 +1,3 @@
-* {
-    -fx-font-family: "Noto Sans Lao", "NotoJP", "sans-serif";
+.root {
+    -fx-font-family: "Inter", "Roboto", "Noto Sans", "Noto Sans Lao", "sans-serif";
 }
-
