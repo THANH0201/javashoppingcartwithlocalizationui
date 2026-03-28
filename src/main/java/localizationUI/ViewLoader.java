@@ -15,8 +15,8 @@ public class ViewLoader {
     public static void loadScene(Stage stage, Locale locale) throws IOException {
 
         Font f = Font.loadFont(ViewLoader.class.getResourceAsStream("/fonts/NotoSansLao-Regular.ttf"), 12);
-
-        System.out.println(f.getName());
+        Font f1 = Font.loadFont(ViewLoader.class.getResourceAsStream("/fonts/NotoSansJP-Regular.ttf"), 12);
+        System.out.println(f1.getName());
         //ResourceBundle if reload FXML
         FXMLLoader loader = new FXMLLoader(Main.class.getResource("/main_view.fxml"));
         Parent root = loader.load();

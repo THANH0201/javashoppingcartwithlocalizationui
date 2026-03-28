@@ -1,6 +1,7 @@
 
 ### Goal
 Build a simple JavaFX GUI application that calculates the total cost of items in a shopping cart, supports localization (multiple languages), and demonstrates Docker and CI/CD pipeline integration### Build Jenkins(CICD)-push docker  
+
 ### Testing Docker Container (Windows + VcXsrv)
 1. Before running the container, start VcXsrv/XLaunch with:
 
