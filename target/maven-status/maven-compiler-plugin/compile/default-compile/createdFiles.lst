@@ -1,0 +1,6 @@
+localizationUI\ItemModel.class
+localizationUI\Main.class
+localizationUI\CartCalculatorService.class
+localizationUI\LocalizationService.class
+localizationUI\MainViewController.class
+localizationUI\ViewLoader.class

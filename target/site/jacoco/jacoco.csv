@@ -1,0 +1,7 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+javashoppingcartwithlocalizationUI,localizationUI,CartCalculatorService,0,55,0,0,0,12,0,1,0,1
+javashoppingcartwithlocalizationUI,localizationUI,ItemModel,0,27,0,0,0,9,0,5,0,5
+javashoppingcartwithlocalizationUI,localizationUI,ViewLoader,41,0,0,0,10,0,2,0,2,0
+javashoppingcartwithlocalizationUI,localizationUI,Main,21,0,0,0,8,0,4,0,4,0
+javashoppingcartwithlocalizationUI,localizationUI,LocalizationService,172,40,11,3,34,10,7,3,1,2
+javashoppingcartwithlocalizationUI,localizationUI,MainViewController,547,0,16,0,123,0,30,0,22,0
